@@ -1,0 +1,33 @@
+{
+	"files.associations": {
+		"**/*.c.orig": "c",
+		"**/*.dasc": "asm-collection",
+		"**/*.lex": "lex",
+		"**/*.log*": "log",
+		"**/*.mak": "makefile",
+		"**/*.mk": "makefile",
+		"**/*.plist": "xml",
+		"**/*.rockspec": "lua",
+		"**/*.sxx": "systemtap",
+		"**/*.txt": "log",
+		"**/*.y": "yacc",
+		"**/*dockerfile": "dockerfile",
+		"**/.luacheckrc": "lua",
+		"**/.vscode/.easyRedis.redis": "json",
+		"**/Kconfig*": "kconfig",
+		"**/Makefile.*": "makefile",
+		"**/Portfile": "tcl",
+		"**/auto/**/*": "shellscript",
+		"**/localconf": "lua",
+		"**/ngx*/**/*.t": "lua",
+		"**/opconf.example": "lua",
+		"**/opconf.lua*": "lua",
+		"**/patch-*": "diff",
+		"lj_obj.h": "c",
+		"lj_bc.h": "c",
+		"lj_arch.h": "c",
+		"lj_def.h": "c"
+	},
+	"editor.detectIndentation": false,
+	"editor.tabSize": 8
+}

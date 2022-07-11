@@ -1,0 +1,25 @@
+{
+        "tasks": [
+                {
+                        "type": "shell",
+                        "label": "make",
+                        "command": "make",
+                        "args": [
+                                "CCDEBUG='-O0 -g'",
+				"Q=",
+                        ],
+                        "options": {
+                                "cwd": "${workspaceFolder}"
+                        },
+                        "problemMatcher": [
+                                "$gcc"
+                        ],
+                        "group": {
+                                "kind": "build",
+                                "isDefault": true
+                        },
+                        "detail": "make"
+                }
+        ],
+        "version": "2.0.0"
+}
