@@ -445,9 +445,9 @@ void lj_meta_call(lua_State *L, TValue *func, TValue *top)
   TValue *p;
   if (!tvisfunc(mo))
     lj_err_optype_call(L, func);
-  for (p = top; p > func+2*LJ_FR2; p--) copyTV(L, p, p-1);
-  if (LJ_FR2) copyTV(L, func+2, func);
-  copyTV(L, func, mo);
+  for (p = top; p > func+2*LJ_FR2; p--) copyTV(L, p, p-1);  /* make room for first arg aka. func*/
+  if (LJ_FR2) copyTV(L, func+2, func); /* copy func as first arg */
+  copyTV(L, func, mo); /* set real func to metamethod.__call */
 }
 
 /* Helper for FORI. Coercion. */
