@@ -304,7 +304,7 @@
 |.macro mov_true, reg; mov64 reg, (int64_t)~((uint64_t)2<<47); .endmacro
 |
 |// These operands must be used with movzx.
-|.define PC_OP, byte [PC-4]
+|.define PC_OP, byte [PC-4]  // PC-4 is pc of current instruction
 |.define PC_RA, byte [PC-3]
 |.define PC_RB, byte [PC-1]
 |.define PC_RC, byte [PC-2]
@@ -3171,7 +3171,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  checknum RB, ->vmeta_unm
     |.endif
     |  mov64 RD, U64x(80000000,00000000)
-    |  xor RB, RD
+    |  xor RB, RD  // flip highest bit to change sign
     |.if DUALNUM
     |  jmp <9
     |.else
@@ -3179,24 +3179,24 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  ins_next
     |.endif
     break;
-  case BC_LEN:
+  case BC_LEN:  // A=#D
     |  ins_AD	// RA = dst, RD = src
     |  mov RD, [BASE+RD*8]
-    |  checkstr RD, >2
+    |  checkstr RD, >2  // check if string
     |.if DUALNUM
-    |  mov RDd, dword STR:RD->len
+    |  mov RDd, dword STR:RD->len  // 32 bit len, GCstr->len
     |1:
     |  setint RD
     |  mov [BASE+RA*8], RD
     |.else
     |  xorps xmm0, xmm0
-    |  cvtsi2sd xmm0, dword STR:RD->len
+    |  cvtsi2sd xmm0, dword STR:RD->len  // expand to 128 bit
     |1:
-    |  movsd qword [BASE+RA*8], xmm0
+    |  movsd qword [BASE+RA*8], xmm0  // 64 bit
     |.endif
     |  ins_next
     |2:
-    |  cmp ITYPEd, LJ_TTAB; jne ->vmeta_len
+    |  cmp ITYPEd, LJ_TTAB; jne ->vmeta_len  // check if table
     |  mov TAB:CARG1, TAB:RD
 #if LJ_52
     |  mov TAB:RB, TAB:RD->metatable
@@ -3205,7 +3205,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |3:
 #endif
     |->BC_LEN_Z:
-    |  mov RB, BASE			// Save BASE.
+    |  mov RB, BASE			// Save BASE. aka. rbp the frame pointer, callee will save before use
     |  call extern lj_tab_len		// (GCtab *t)
     |  // Length of table returned in eax (RD).
     |.if DUALNUM
@@ -3214,12 +3214,12 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  cvtsi2sd xmm0, RDd
     |.endif
     |  mov BASE, RB			// Restore BASE.
-    |  movzx RAd, PC_RA
+    |  movzx RAd, PC_RA  // restore RAd, aka ecx might have overwritten by lj_tab_len
     |  jmp <1
 #if LJ_52
     |9:  // Check for __len.
-    |  test byte TAB:RB->nomm, 1<<MM_len
-    |  jnz <3
+    |  test byte TAB:RB->nomm, 1<<MM_len  // logical AND: TAB:RB->nomm & (1<<MM_len)
+    |  jnz <3  // not zero means 'no __len' flag set
     |  jmp ->vmeta_len			// 'no __len' flag NOT set: check.
 #endif
     break;

@@ -70,11 +70,12 @@
 */
 #define BCDEF(_) \
   /* Comparison ops. ORDER OPR. */ \
+  /* 0 */ \
   _(ISLT,	var,	___,	var,	lt) \
   _(ISGE,	var,	___,	var,	lt) \
   _(ISLE,	var,	___,	var,	le) \
   _(ISGT,	var,	___,	var,	le) \
-  \
+  /* 4 */\
   _(ISEQV,	var,	___,	var,	eq) \
   _(ISNEV,	var,	___,	var,	eq) \
   _(ISEQS,	var,	___,	str,	eq) \
@@ -83,7 +84,7 @@
   _(ISNEN,	var,	___,	num,	eq) \
   _(ISEQP,	var,	___,	pri,	eq) \
   _(ISNEP,	var,	___,	pri,	eq) \
-  \
+  /* 12 */\
   /* Unary test and copy ops. */ \
   _(ISTC,	dst,	___,	var,	___) \
   _(ISFC,	dst,	___,	var,	___) \
@@ -91,35 +92,35 @@
   _(ISF,	___,	___,	var,	___) \
   _(ISTYPE,	var,	___,	lit,	___) \
   _(ISNUM,	var,	___,	lit,	___) \
-  \
+  /* 18 */\
   /* Unary ops. */ \
   _(MOV,	dst,	___,	var,	___) \
   _(NOT,	dst,	___,	var,	___) \
   _(UNM,	dst,	___,	var,	unm) \
   _(LEN,	dst,	___,	var,	len) \
-  \
+  /* 22 */\
   /* Binary ops. ORDER OPR. VV last, POW must be next. */ \
   _(ADDVN,	dst,	var,	num,	add) \
   _(SUBVN,	dst,	var,	num,	sub) \
   _(MULVN,	dst,	var,	num,	mul) \
   _(DIVVN,	dst,	var,	num,	div) \
   _(MODVN,	dst,	var,	num,	mod) \
-  \
+  /* 27 */\
   _(ADDNV,	dst,	var,	num,	add) \
   _(SUBNV,	dst,	var,	num,	sub) \
   _(MULNV,	dst,	var,	num,	mul) \
   _(DIVNV,	dst,	var,	num,	div) \
   _(MODNV,	dst,	var,	num,	mod) \
-  \
+  /* 32 */\
   _(ADDVV,	dst,	var,	var,	add) \
   _(SUBVV,	dst,	var,	var,	sub) \
   _(MULVV,	dst,	var,	var,	mul) \
   _(DIVVV,	dst,	var,	var,	div) \
   _(MODVV,	dst,	var,	var,	mod) \
-  \
+  /* 37 */\
   _(POW,	dst,	var,	var,	pow) \
   _(CAT,	dst,	rbase,	rbase,	concat) \
-  \
+  /* 39 */\
   /* Constant ops. */ \
   _(KSTR,	dst,	___,	str,	___) \
   _(KCDATA,	dst,	___,	cdata,	___) \
@@ -127,7 +128,7 @@
   _(KNUM,	dst,	___,	num,	___) \
   _(KPRI,	dst,	___,	pri,	___) \
   _(KNIL,	base,	___,	base,	___) \
-  \
+  /* 45 */\
   /* Upvalue and function ops. */ \
   _(UGET,	dst,	___,	uv,	___) \
   _(USETV,	uv,	___,	var,	___) \
@@ -136,7 +137,7 @@
   _(USETP,	uv,	___,	pri,	___) \
   _(UCLO,	rbase,	___,	jump,	___) \
   _(FNEW,	dst,	___,	func,	gc) \
-  \
+  /* 52 */\
   /* Table ops. */ \
   _(TNEW,	dst,	___,	lit,	gc) \
   _(TDUP,	dst,	___,	tab,	gc) \
@@ -151,7 +152,7 @@
   _(TSETB,	var,	var,	lit,	newindex) \
   _(TSETM,	base,	___,	num,	newindex) \
   _(TSETR,	var,	var,	var,	newindex) \
-  \
+  /* 65 */\
   /* Calls and vararg handling. T = tail call. */ \
   _(CALLM,	base,	lit,	lit,	call) \
   _(CALL,	base,	lit,	lit,	call) \
@@ -161,31 +162,31 @@
   _(ITERN,	base,	lit,	lit,	call) \
   _(VARG,	base,	lit,	lit,	___) \
   _(ISNEXT,	base,	___,	jump,	___) \
-  \
+  /* 73 */\
   /* Returns. */ \
   _(RETM,	base,	___,	lit,	___) \
   _(RET,	rbase,	___,	lit,	___) \
   _(RET0,	rbase,	___,	lit,	___) \
   _(RET1,	rbase,	___,	lit,	___) \
-  \
+  /* 77 */\
   /* Loops and branches. I/J = interp/JIT, I/C/L = init/call/loop. */ \
   _(FORI,	base,	___,	jump,	___) \
   _(JFORI,	base,	___,	jump,	___) \
-  \
+  /* 79 */\
   _(FORL,	base,	___,	jump,	___) \
   _(IFORL,	base,	___,	jump,	___) \
   _(JFORL,	base,	___,	lit,	___) \
-  \
+  /* 82 */\
   _(ITERL,	base,	___,	jump,	___) \
   _(IITERL,	base,	___,	jump,	___) \
   _(JITERL,	base,	___,	lit,	___) \
-  \
+  /* 85 */\
   _(LOOP,	rbase,	___,	jump,	___) \
   _(ILOOP,	rbase,	___,	jump,	___) \
   _(JLOOP,	rbase,	___,	lit,	___) \
-  \
+  /* 88 */\
   _(JMP,	rbase,	___,	jump,	___) \
-  \
+  /* 89 */\
   /* Function headers. I/J = interp/JIT, F/V/C = fixarg/vararg/C func. */ \
   _(FUNCF,	rbase,	___,	___,	___) \
   _(IFUNCF,	rbase,	___,	___,	___) \
@@ -195,7 +196,7 @@
   _(JFUNCV,	rbase,	___,	lit,	___) \
   _(FUNCC,	rbase,	___,	___,	___) \
   _(FUNCCW,	rbase,	___,	___,	___)
-
+  /* 97 */
 /* Bytecode opcode numbers. */
 typedef enum {
 #define BCENUM(name, ma, mb, mc, mt)	BC_##name,
