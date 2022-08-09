@@ -3142,13 +3142,13 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
   case BC_NOT:
     |  ins_AD	// RA = dst, RD = src
     |  mov RB, [BASE+RD*8]
-    |  sar RB, 47
-    |  mov RCd, 2
-    |  cmp RB, LJ_TISTRUECOND
-    |  sbb RCd, 0
-    |  shl RC, 47
-    |  not RC
-    |  mov [BASE+RA*8], RC
+    |  sar RB, 47  // itype(RD)
+    |  mov RCd, 2  // ~LJ_TTRUE = ~(~2u)
+    |  cmp RB, LJ_TISTRUECOND  // if itype(RD) <= LJ_TFALSE (~1u), aka. nil and false
+    |  sbb RCd, 0  // if Carry Flag set then result is false
+    |  shl RC, 47  // shift to type bits
+    |  not RC  // convert 1 to LJ_TFALSE, 2 to LJ_TTRUE
+    |  mov [BASE+RA*8], RC  // RA = result
     |  ins_next
     break;
   case BC_UNM:
