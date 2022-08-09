@@ -3151,19 +3151,19 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  mov [BASE+RA*8], RC  // RA = result
     |  ins_next
     break;
-  case BC_UNM:
+  case BC_UNM:  // unary minus A=-D
     |  ins_AD	// RA = dst, RD = src
     |  mov RB, [BASE+RD*8]
-    |.if DUALNUM
+    |.if DUALNUM  // dual 32 bit integers, see lj_obj.h, DUALNUM=1 if LUAJIT_NUMMODE=2 and x64, not a good choice
     |  checkint RB, >5
-    |  neg RBd
-    |  jo >4
+    |  neg RBd  // neg lower 32 bits, ** int (LJ_DUALNUM)   |1..1|itype|0..0|-----int-------|
+    |  jo >4  // jump if overflow flag is set, -2^31 neg to 2^31 will overflow, max positive signed 32 bit int is 2^31-1
     |  setint RB
     |9:
     |  mov [BASE+RA*8], RB
     |  ins_next
     |4:
-    |  mov64 RB, U64x(41e00000,00000000)  // 2^31.
+    |  mov64 RB, U64x(41e00000,00000000)  // 2^31. double 2147483648 to hex 0x41e0000000000000, https://gregstoll.com/~gregstoll/floattohex/
     |  jmp <9
     |5:
     |  ja ->vmeta_unm
