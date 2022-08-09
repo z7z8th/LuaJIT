@@ -3230,7 +3230,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  ins_ABC
     ||vk = ((int)op - BC_ADDVN) / (BC_ADDNV-BC_ADDVN);
     ||switch (vk) {
-    ||case 0:
+    ||case 0:  // *VN
     |   checknumtp [BASE+RB*8], ->vmeta_arith_vn
     |   .if DUALNUM
     |     checknumtp [KBASE+RC*8], ->vmeta_arith_vn
@@ -3238,7 +3238,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |   movsd xmm0, qword [BASE+RB*8]
     |   sseins ssereg, qword [KBASE+RC*8]
     ||  break;
-    ||case 1:
+    ||case 1:  // *NV
     |   checknumtp [BASE+RB*8], ->vmeta_arith_nv
     |   .if DUALNUM
     |     checknumtp [KBASE+RC*8], ->vmeta_arith_nv
@@ -3246,7 +3246,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |   movsd xmm0, qword [KBASE+RC*8]
     |   sseins ssereg, qword [BASE+RB*8]
     ||  break;
-    ||default:
+    ||default:  // *VV
     |   checknumtp [BASE+RB*8], ->vmeta_arith_vv
     |   checknumtp [BASE+RC*8], ->vmeta_arith_vv
     |   movsd xmm0, qword [BASE+RB*8]
@@ -3320,12 +3320,12 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  ins_arith imul, mulsd
     break;
   case BC_DIVVN: case BC_DIVNV: case BC_DIVVV:
-    |  ins_arith divsd
+    |  ins_arith divsd  // select macro by param count
     break;
   case BC_MODVN:
-    |  ins_arithpre movsd, xmm1
+    |  ins_arithpre movsd, xmm1  // xmm0 = B, xmm1 = C
     |->BC_MODVN_Z:
-    |  call ->vm_mod
+    |  call ->vm_mod  // xmm0 % xmm1
     |  ins_arithpost
     |  ins_next
     break;
@@ -3336,14 +3336,14 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
   case BC_POW:
     |  ins_arithpre movsd, xmm1
     |  mov RB, BASE
-    |  call extern pow
+    |  call extern pow  // where is pow? in std c lib?
     |  movzx RAd, PC_RA
     |  mov BASE, RB
     |  ins_arithpost
     |  ins_next
     break;
 
-  case BC_CAT:
+  case BC_CAT:  // A = B .. ~ .. C, concatenates all values in variable slots B to C inclusive.
     |  ins_ABC	// RA = dst, RB = src_start, RC = src_end
     |  mov L:CARG1, SAVE_L
     |  mov L:CARG1->base, BASE
@@ -3419,7 +3419,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  mov [RA], RB
     |  add RA, 8
     |  cmp RA, RD
-    |  jbe <1
+    |  jbe <1  // Jcc, jbe jmp if below or equal
     |  ins_next
     break;
 
