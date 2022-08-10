@@ -3538,7 +3538,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  ins_next
     break;
 
-  case BC_FNEW:
+  case BC_FNEW:  // how upvalue works: https://www.cs.tufts.edu/~nr/cs257/archive/roberto-ierusalimschy/closures-draft.pdf
     |  ins_AND	// RA = dst, RD = proto const (~) (holding function prototype)
     |  mov L:RB, SAVE_L
     |  mov L:RB->base, BASE		// Caveat: CARG2/CARG3 may be BASE.

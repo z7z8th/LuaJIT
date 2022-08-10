@@ -33,6 +33,8 @@ static void unlinkuv(global_State *g, GCupval *uv)
   setgcrefr(uvprev(uv)->next, uv->next);
 }
 
+
+// see also https://www.cs.tufts.edu/~nr/cs257/archive/roberto-ierusalimschy/closures-draft.pdf
 /* Find existing open upvalue for a stack slot or create a new one. */
 static GCupval *func_finduv(lua_State *L, TValue *slot)
 {
