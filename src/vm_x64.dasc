@@ -3429,9 +3429,9 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  ins_AD	// RA = dst, RD = upvalue #
     |  mov LFUNC:RB, [BASE-16]
     |  cleartp LFUNC:RB
-    |  mov UPVAL:RB, [LFUNC:RB+RD*8+offsetof(GCfuncL, uvptr)]
-    |  mov RB, UPVAL:RB->v
-    |  mov RD, [RB]
+    |  mov UPVAL:RB, [LFUNC:RB+RD*8+offsetof(GCfuncL, uvptr)] // (GCupval *)GCfuncL->uvptr[RD].gcptr64
+    |  mov RB, UPVAL:RB->v  // points to stack slot
+    |  mov RD, [RB]  // RD = *(TValue *)GCupval->v
     |  mov [BASE+RA*8], RD
     |  ins_next
     break;
