@@ -162,13 +162,13 @@ clean:
 	$(MAKE) -C src clean
 
 tags:
-	@UCTAGSVER=$$(ctags --version | sed -E -e '/^Universal Ctags [0-9]+.[0-9]+/{s/^Universal Ctags ([0-9]+.[0-9]+).*/\1/;q;}'); \
+	@UCTAGSVER=$$(ctags --version | sed -n -E -e '/^Universal Ctags [0-9]+.[0-9]+/{s/^Universal Ctags ([0-9]+.[0-9]+).*/\1/p;q;}'); \
 	MAJORV=$${UCTAGSVER%.*}; MINORV=$${UCTAGSVER#*.}; \
 	if [ "$$MAJORV" = 5 ] && [ "$$MINORV" -lt 9 ] || [ "$$MAJORV" -lt 5 ]; then \
 		echo "Universal Ctags version >= 5.9 is required"; \
 		exit 1; \
 	fi
-	ctags -R -f .tags  --options=Asm.ctags .
+	ctags -R -f .tags --options=Asm.ctags .
 
 .PHONY: all install amalg clean tags
 
