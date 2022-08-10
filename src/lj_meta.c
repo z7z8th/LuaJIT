@@ -118,6 +118,7 @@ static TValue *mmcall(lua_State *L, ASMFunction cont, cTValue *mo,
   **                                       ignore   for lj_cont_nop
   ** next PC:  [func slots ...]
   */
+  // LJ_FR2: [lj_cont_ra or ...][PC][metamethod][new base - base][a][b]
   TValue *top = L->top;
   if (curr_funcisL(L)) top = curr_topL(L);
   setcont(top++, cont);  /* Assembler VM stores PC in upper word or FR2. */

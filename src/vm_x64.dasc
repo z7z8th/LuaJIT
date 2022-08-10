@@ -680,13 +680,13 @@ static void build_subroutines(BuildCtx *ctx)
   |->cont_dispatch:
   |  // BASE = meta base, RA = resultofs, RD = nresults+1 (also in MULTRES)
   |  add RA, BASE
-  |  and PC, -8
+  |  and PC, -8  // PC &= ~7u, clear frame type bits
   |  mov RB, BASE
   |  sub BASE, PC			// Restore caller BASE.
   |  mov aword [RA+RD*8-8], LJ_TNIL	// Ensure one valid arg.
   |  mov RC, RA				// ... in [RC]
   |  mov PC, [RB-24]			// Restore PC from [cont|PC].
-  |  mov RA, qword [RB-32]		// May be negative on WIN64 with debug.
+  |  mov RA, qword [RB-32]		// May be negative on WIN64 with debug. // RA=->cont_ra on some condition
   |.if FFI
   |  cmp RA, 1
   |  jbe >1
@@ -696,7 +696,7 @@ static void build_subroutines(BuildCtx *ctx)
   |  mov KBASE, LFUNC:KBASE->pc
   |  mov KBASE, [KBASE+PC2PROTO(k)]
   |  // BASE = base, RC = result, RB = meta base
-  |  jmp RA				// Jump to continuation.
+  |  jmp RA				// Jump to continuation. // jump to ->cont_ra for metamethod return
   |
   |.if FFI
   |1:
@@ -786,7 +786,7 @@ static void build_subroutines(BuildCtx *ctx)
   |  // BASE = base, L->top = new base, stack = cont/func/t/k
   |  mov RA, L:RB->top
   |  mov [RA-24], PC			// [cont|PC]
-  |  lea PC, [RA+FRAME_CONT]
+  |  lea PC, [RA+FRAME_CONT]  // lower bits is frame type, FRAME_CONT here, used by BC_RET*
   |  sub PC, BASE
   |  mov LFUNC:RB, [RA-16]		// Guaranteed to be a function here. the actual metamethod, eg. __index metamethod
   |  mov NARGS:RDd, 2+1			// 2 args for func(t, k).
@@ -3635,7 +3635,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  jmp ->BC_TSETS_Z
     break;
 
-  case BC_TGETV:  // A=B[C]
+  case BC_TGETV:  // BC_TGETV -> vmeta_tgetv -> lj_meta_tget -> cont_ra >3 PC=[new base-base + FRAME_CONT] -> mmcall -> vm_call_dispatch_f -> BC_RET -> >7 -> vm_return -> vm_returnp -> cont_dispatch -> jump cont frame aka. cont_ra -> BASE[PC_RA] = BASEE[RC]
     |  ins_ABC	// RA = dst, RB = table, RC = key
     |  mov TAB:RB, [BASE+RB*8]
     |  mov RC, [BASE+RC*8]
@@ -4297,7 +4297,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  add RD, 1
     |  jmp <5
     |
-    |7:  // Non-standard return case.
+    |7:  // Non-standard return case.  // metamethod call with FRAME_CONT goes here
     |  lea RB, [PC-FRAME_VARG]
     |  test RBd, FRAME_TYPEP
     |  jnz ->vm_return
