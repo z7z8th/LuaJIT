@@ -782,13 +782,13 @@ static void build_subroutines(BuildCtx *ctx)
   |  mov [BASE+RA*8], RB
   |  ins_next
   |
-  |3:  // Call __index metamethod.
+  |3:  // Call __index metamethod.  // see lj_frame.h for continuous frame
   |  // BASE = base, L->top = new base, stack = cont/func/t/k
   |  mov RA, L:RB->top
   |  mov [RA-24], PC			// [cont|PC]
   |  lea PC, [RA+FRAME_CONT]
   |  sub PC, BASE
-  |  mov LFUNC:RB, [RA-16]		// Guaranteed to be a function here.
+  |  mov LFUNC:RB, [RA-16]		// Guaranteed to be a function here. the actual metamethod, eg. __index metamethod
   |  mov NARGS:RDd, 2+1			// 2 args for func(t, k).
   |  cleartp LFUNC:RB
   |  jmp ->vm_call_dispatch_f
@@ -3559,7 +3559,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
 
   /* -- Table ops --------------------------------------------------------- */
 
-  case BC_TNEW:
+  case BC_TNEW:  // The 16 bit literal D operand of TNEW is split up into two fields: the lowest 11 bits give the array size (allocates slots 0..asize-1, or none if zero). The upper 5 bits give the hash size as a power of two (allocates 2^hsize hash slots, or none if zero).
     |  ins_AD	// RA = dst, RD = hbits|asize
     |  mov L:RB, SAVE_L
     |  mov L:RB->base, BASE
@@ -3592,7 +3592,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  movzx RDd, PC_RD
     |  jmp <1
     break;
-  case BC_TDUP:
+  case BC_TDUP:  // when will this instr be used?
     |  ins_AND	// RA = dst, RD = table const (~) (holding template table)
     |  mov L:RB, SAVE_L
     |  mov RA, [DISPATCH+DISPATCH_GL(gc.total)]
@@ -3618,7 +3618,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  jmp <2
     break;
 
-  case BC_GGET:
+  case BC_GGET:  // A=_G[D] GGET and GSET are named 'global' get and set, but actually index the current function environment getfenv(1) (which is usually the same as _G).
     |  ins_AND	// RA = dst, RD = str const (~)
     |  mov LFUNC:RB, [BASE-16]
     |  cleartp LFUNC:RB
@@ -3626,7 +3626,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  mov STR:RC, [KBASE+RD*8]
     |  jmp ->BC_TGETS_Z
     break;
-  case BC_GSET:
+  case BC_GSET:  // _G[D]=A
     |  ins_AND	// RA = src, RD = str const (~)
     |  mov LFUNC:RB, [BASE-16]
     |  cleartp LFUNC:RB
@@ -3635,7 +3635,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  jmp ->BC_TSETS_Z
     break;
 
-  case BC_TGETV:
+  case BC_TGETV:  // A=B[C]
     |  ins_ABC	// RA = dst, RB = table, RC = key
     |  mov TAB:RB, [BASE+RB*8]
     |  mov RC, [BASE+RC*8]
@@ -3645,7 +3645,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |.if DUALNUM
     |  checkint RC, >5
     |.else
-    |  // Convert number to int and back and compare.
+    |  // Convert number to int and back and compare. // infini? nan?
     |  checknum RC, >5
     |  movd xmm0, RC
     |  cvttsd2si RCd, xmm0
@@ -3656,7 +3656,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  cmp RCd, TAB:RB->asize		// Takes care of unordered, too.
     |  jae ->vmeta_tgetv		// Not in array part? Use fallback.
     |  shl RCd, 3
-    |  add RC, TAB:RB->array
+    |  add RC, TAB:RB->array  // GCtab->array[RC]
     |  // Get array slot.
     |  mov ITYPE, [RC]
     |  cmp ITYPE, LJ_TNIL		// Avoid overwriting RB in fastpath.
@@ -3668,7 +3668,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |2:  // Check for __index if table value is nil.
     |  mov TAB:TMPR, TAB:RB->metatable
     |  test TAB:TMPR, TAB:TMPR
-    |  jz <1
+    |  jz <1  // no metatable
     |  test byte TAB:TMPR->nomm, 1<<MM_index
     |  jz ->vmeta_tgetv			// 'no __index' flag NOT set: check.
     |  jmp <1
