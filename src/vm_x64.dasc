@@ -3443,10 +3443,10 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  cleartp LFUNC:RB
     |  mov UPVAL:RB, [LFUNC:RB+RA*8+offsetof(GCfuncL, uvptr)]
     |  cmp byte UPVAL:RB->closed, 0
-    |  mov RB, UPVAL:RB->v
+    |  mov RB, UPVAL:RB->v  // GCupval.v points to GCupval.tv if closed
     |  mov RA, [BASE+RD*8]
     |  mov [RB], RA
-    |  jz >1
+    |  jz >1  // if not closed then jump to >1
     |  // Check barrier for closed upvalue.
     |  test byte [RB+TV2MARKOFS], LJ_GC_BLACK		// isblack(uv)
     |  jnz >2
@@ -3475,7 +3475,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  jmp <1
     break;
 #undef TV2MARKOFS
-  case BC_USETS:
+  case BC_USETS:  // *(TValue *)( ((GCupval *)(GCfuncL->uvptr[RA].gcptr64))->v ).ptr64 = KBASE[RD]
     |  ins_AND	// RA = upvalue #, RD = str const (~)
     |  mov LFUNC:RB, [BASE-16]
     |  cleartp LFUNC:RB
@@ -3523,12 +3523,12 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  mov [RA], RD
     |  ins_next
     break;
-  case BC_UCLO:
+  case BC_UCLO:  // UCLO rbase jump : Close upvalues for slots ≥ rbase and jump to target D
     |  ins_AD	// RA = level, RD = target
     |  branchPC RD			// Do this first to free RD.
     |  mov L:RB, SAVE_L
     |  cmp aword L:RB->openupval, 0
-    |  je >1
+    |  je >1  // jump short if equal (ZF=1)
     |  mov L:RB->base, BASE
     |  lea CARG2, [BASE+RA*8]		// Caveat: CARG2 == BASE
     |  mov L:CARG1, L:RB		// Caveat: CARG1 == RA
