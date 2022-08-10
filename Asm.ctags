@@ -1,0 +1,19 @@
+# universal tags 5.9
+--langmap=Asm:.dasc.S.s.asm
+
+--param-Asm.useCPreProcessor=true
+--param-CPreProcessor._expand=1
+--fields=+{signature}
+--fields-CPreProcessor=+{macrodef}
+
+--param-Asm.commentCharsInMOL=//
+--param-Asm.extraLinesepChars=;
+
+--regex-Asm=/\bcase[[:space:]]+([a-zA-Z_0-9]+):/\1/l/e
+--regex-Asm=/^[[:space:]]*\|[[:space:]]*->([a-zA-Z_0-9]+):/\1/l/e
+--regex-Asm=/^[[:space:]]*(\|[[:space:]]*\.|#)define[[:space:]]+([a-zA-Z_0-9]+)/\2/d/e
+--regex-Asm=/^[[:space:]]*\|[[:space:]]*\.macro[[:space:]]+([a-zA-Z_0-9]+)/\1/m/e
+--regex-Asm=/^[[:space:]]*\|[[:space:]]*\.([a-zA-Z_0-9]+)[[:space:]]+([a-zA-Z_0-9]+)/\2/d/e
+
+--extras=f
+--tag-relative
