@@ -4054,7 +4054,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  jmp <1
     break;
 
-  case BC_ITERC:
+  case BC_ITERC:  // [-5:fn][-4:state][-3:ctrl]ra_base->[-2:fn][-1:]base->[0:state][1:ctrl]
     |  ins_A	// RA = base, (RB = nresults+1,) RC = nargs+1 (2+1)
     |  lea RA, [BASE+RA*8+16]		// fb = base+2
     |  mov RB, [RA-32]			// Copy state. fb[0] = fb[-4].
@@ -4478,7 +4478,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
 #if !LJ_HASJIT
     break;
 #endif
-  case BC_IITERL:
+  case BC_IITERL:  // check return val by ITERC: [ctrl_var aka index][value]
     |  ins_AJ	// RA = base, RD = target
     |  lea RA, [BASE+RA*8]
     |  mov RB, [RA]
@@ -4487,8 +4487,8 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
       |  mov [RA-8], RB
       |  jmp =>BC_JLOOP
     } else {
-      |  branchPC RD			// Otherwise save control var + branch.
-      |  mov [RA-8], RB
+      |  branchPC RD			// Otherwise save control var + branch.  // set pc to loop body
+      |  mov [RA-8], RB  // update control var
     }
     |1:
     |  ins_next
