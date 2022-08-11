@@ -3985,7 +3985,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
   case BC_CALL: case BC_CALLM:
     |  ins_A_C	// RA = base, (RB = nresults+1,) RC = nargs+1 | extra_nargs
     if (op == BC_CALLM) {
-      |  add NARGS:RDd, MULTRES
+      |  add NARGS:RDd, MULTRES  // MULTRES at [rsp], stack top
     }
     |  mov LFUNC:RB, [BASE+RA*8]
     |  checkfunc LFUNC:RB, ->vmeta_call_ra
@@ -4013,7 +4013,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  mov MULTRES, NARGS:RDd
     |  sub NARGS:RDd, 1
     |  jz >3
-    |2:  // Move args down.
+    |2:  // Move args down.  // copy new function args to current frame
     |  mov RB, [RA]
     |  add RA, 8
     |  mov [KBASE], RB
