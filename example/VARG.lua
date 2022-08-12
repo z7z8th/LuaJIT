@@ -15,7 +15,7 @@ KGC    1    "#"
 0003     [2]    VARG     6   0   3
 0004     [2]    CALLM    3   2   1
 0005     [3]    TNEW     4   3
-0006     [3]    VARG     5   0   3
+0006     [3]    VARG     5   0   3  ; BASE[-1] is 0x53, FrameLink->ftsz, 0x3 is FRAME_VARG, 0x50 is size of previous frame = (8 + 1 + 1) * 8
 0007     [3]    TSETM    5   0      ; 1
 0008     [4]    RET0     0   1
 

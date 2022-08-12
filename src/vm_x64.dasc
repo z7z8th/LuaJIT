@@ -4163,11 +4163,11 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |.endif
     break;
 
-  case BC_VARG:
+  case BC_VARG:  // copy varg slots: [fn1][pc]|[-ftsz:fixed_arg1][-ftsz+1:fixed_arg2][:fixed_arg3][][]TMPR->[...][-2:fn1][-1:ftsz]|base[fixed_arg1][fixed_arg2][fixed_arg3][RA:][][][RB:]
     |  ins_ABC	// RA = base, RB = nresults+1, RC = numparams (aka. normal args before ...)
     |  lea TMPR, [BASE+RC*8+(16+FRAME_VARG)]
     |  lea RA, [BASE+RA*8]
-    |  sub TMPR, [BASE-8]
+    |  sub TMPR, [BASE-8]  // FrameLink->ftsz, frame_size + frame_type of previous frame, BC_CALL knows how many args, then BC_IFUNCV setup BASE[-1] from RDd
     |  // Note: TMPR may now be even _above_ BASE if nargs was < numparams.
     |  test RB, RB
     |  jz >5				// Copy all varargs?
@@ -4608,7 +4608,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
   case BC_IFUNCV:
     |  ins_AD  // BASE = new base, RA = framesize, RD = nargs+1
     |  lea RBd, [NARGS:RD*8+FRAME_VARG+8]
-    |  lea RD, [BASE+NARGS:RD*8+8]
+    |  lea RD, [BASE+NARGS:RD*8+8]  // new varg frame base
     |  mov LFUNC:KBASE, [BASE-16]
     |  mov [RD-8], RB			// Store delta + FRAME_VARG.
     |  mov [RD-16], LFUNC:KBASE		// Store copy of LFUNC.
@@ -4617,7 +4617,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  cmp RA, L:RB->maxstack
     |  ja ->vm_growstack_v		// Need to grow stack.
     |  mov RA, BASE
-    |  mov BASE, RD
+    |  mov BASE, RD  // update base
     |  movzx RBd, byte [PC-4+PC2PROTO(numparams)]
     |  test RBd, RBd
     |  jz >2
