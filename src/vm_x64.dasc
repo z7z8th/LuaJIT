@@ -4164,7 +4164,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     break;
 
   case BC_VARG:
-    |  ins_ABC	// RA = base, RB = nresults+1, RC = numparams
+    |  ins_ABC	// RA = base, RB = nresults+1, RC = numparams (aka. normal args before ...)
     |  lea TMPR, [BASE+RC*8+(16+FRAME_VARG)]
     |  lea RA, [BASE+RA*8]
     |  sub TMPR, [BASE-8]
