@@ -3933,17 +3933,17 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  jmp <2
     break;
 
-  case BC_TSETM:
+  case BC_TSETM:  // Operand D of TSETM points to a biased floating-point number in the constant table. Only the lowest 32 bits from the mantissa are used as a starting table index. MULTRES from the previous bytecode gives the number of table slots to fill.
     |  ins_AD	// RA = base (table at base-1), RD = num const (start index)
     |1:
-    |  mov TMPRd, dword [KBASE+RD*8]	// Integer constant is in lo-word.
+    |  mov TMPRd, dword [KBASE+RD*8]	// Integer constant is in lo-word.  // compute start index, 32 bit
     |  lea RA, [BASE+RA*8]
     |  mov TAB:RB, [RA-8]		// Guaranteed to be a table.
     |  cleartp TAB:RB
     |  test byte TAB:RB->marked, LJ_GC_BLACK	// isblack(table)
     |  jnz >7
     |2:
-    |  mov RDd, MULTRES
+    |  mov RDd, MULTRES  // MULTRES: number of slots to fill
     |  sub RDd, 1
     |  jz >4				// Nothing to copy?
     |  add RDd, TMPRd			// Compute needed size.
@@ -3951,7 +3951,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  ja >5				// Doesn't fit into array part?
     |  sub RDd, TMPRd
     |  shl TMPRd, 3
-    |  add TMPR, TAB:RB->array
+    |  add TMPR, TAB:RB->array  // compute abs start address, TMPR = &GCtab->array[KBASE[RD]]
     |3:  // Copy result slots to table.
     |  mov RB, [RA]
     |  add RA, 8
