@@ -21,3 +21,17 @@ KGC    1    "pairs"
 0009     [4]    ITERL    5 => 0007
 0010     [6]    RET0     0   1
 ]]
+
+--[[
+aka ITERC, stack: [fn:next][state][ctrl][fn:next][pc]|[state][ctrl]
+stack after inst: [fn:next][state][new ctrl][ctrl/key][value]
+]]
+
+--[[
+  stack for ITERN: [state][ctrl]|base
+stack after ITERN: [state][new ctrl]|base[ctrl/key][value]
+ITERL : check new_ctrl, if not nil then run loop body, else done
+during iterating array part, k is the same as ctrl, new ctrl = ctrl + 1
+during iterating hash part, ctrl = array size + node offset, ++ after each iter, k is key, not equal with ctrl
+ctrl is always an integer, and not visible during iterating hash part in user code
+]]
