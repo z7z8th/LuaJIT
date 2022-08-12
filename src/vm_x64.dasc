@@ -4130,26 +4130,26 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  jmp <6
     break;
 
-  case BC_ISNEXT:
+  case BC_ISNEXT:  // check if next, patch byte code accordingly
     |  ins_AD	// RA = base, RD = target (points to ITERN)
     |  mov CFUNC:RB, [BASE+RA*8-24]
     |  checkfunc CFUNC:RB, >5
     |  checktptp [BASE+RA*8-16], LJ_TTAB, >5
     |  cmp aword [BASE+RA*8-8], LJ_TNIL; jne >5
     |  cmp byte CFUNC:RB->ffid, FF_next_N; jne >5
-    |  branchPC RD
-    |  mov64 TMPR, ((uint64_t)LJ_KEYINDEX << 32)
+    |  branchPC RD  // modify PC for branching to RD
+    |  mov64 TMPR, ((uint64_t)LJ_KEYINDEX << 32)  // lightuserdata 0
     |  mov [BASE+RA*8-8], TMPR		// Initialize control var.
     |1:
     |  ins_next
     |5:  // Despecialize bytecode if any of the checks fail.
-    |  mov PC_OP, BC_JMP
+    |  mov PC_OP, BC_JMP  // modify ISNEXT to JMP
     |  branchPC RD
     |.if JIT
-    |  cmp byte [PC], BC_ITERN
+    |  cmp byte [PC], BC_ITERN  // PATCH
     |  jne >6
     |.endif
-    |  mov byte [PC], BC_ITERC
+    |  mov byte [PC], BC_ITERC  // not next, PATCH, use ITERC for generic iterate
     |  jmp <1
     |.if JIT
     |6:  // Unpatch JLOOP.
