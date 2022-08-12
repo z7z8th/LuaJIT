@@ -1,4 +1,5 @@
 -- how pairs work
+-- code equivalent with `for k,v in pairs(t) do ... end`
 
 local t = {111, 222, 333, a = 'aaa', b = 'bbb'}
 
