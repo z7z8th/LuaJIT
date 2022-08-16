@@ -4605,7 +4605,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     | int3  // NYI: compiled vararg functions
     break;  /* NYI: compiled vararg functions. */
 
-  case BC_IFUNCV:
+  case BC_IFUNCV:  // Will setup additional dummy frame for varg: [fn1][pc]|[-ftsz:fixed_arg1][-ftsz+1:fixed_arg2][:fixed_arg3][][]TMPR->[...][-2:fn1][-1:ftsz]|base[fixed_arg1][fixed_arg2][fixed_arg3]
     |  ins_AD  // BASE = new base, RA = framesize, RD = nargs+1
     |  lea RBd, [NARGS:RD*8+FRAME_VARG+8]
     |  lea RD, [BASE+NARGS:RD*8+8]  // new varg frame base
