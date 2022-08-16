@@ -4438,8 +4438,8 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
       |.if DUALNUM
       |  jnb <7
       |.else
-      |  jnb >2  // stop > idx if step > 0, idx > stop if step < 0
-      |  branchPC RD
+      |  jnb >2  // not done yet, enter loop, next instr is loop body
+      |  branchPC RD  // skip loop
       |.endif
     } else if (op == BC_JFORI) {
       |  branchPC RD
@@ -4449,8 +4449,8 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
       |.if DUALNUM
       |  jb <7
       |.else
-      |  jb >2
-      |  branchPC RD
+      |  jb >2  // done if step > 0 and IDX > STOP or step < 0 IDX < STOP, next instr is out of loop
+      |  branchPC RD  // next loop
       |.endif
     } else {
       |  jnb =>BC_JLOOP
