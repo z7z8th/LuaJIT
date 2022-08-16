@@ -4427,7 +4427,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     if (vk) {
       |  addsd xmm0, qword FOR_STEP
       |  movsd qword FOR_IDX, xmm0
-      |  test RB, RB; js >3
+      |  test RB, RB; js >3  // FORL if step < 0 jump to >3
     } else {
       |  jl >3
     }
@@ -4438,7 +4438,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
       |.if DUALNUM
       |  jnb <7
       |.else
-      |  jnb >2
+      |  jnb >2  // stop > idx if step > 0, idx > stop if step < 0
       |  branchPC RD
       |.endif
     } else if (op == BC_JFORI) {
