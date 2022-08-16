@@ -4572,14 +4572,14 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
 #if !LJ_HASJIT
     break;
 #endif
-  case BC_IFUNCF:
+  case BC_IFUNCF:  // [GCproto size 104][PC][PC+4], PC2PROTO(k) = -0x28
     |  ins_AD  // BASE = new base, RA = framesize, RD = nargs+1
-    |  mov KBASE, [PC-4+PC2PROTO(k)]
+    |  mov KBASE, [PC-4+PC2PROTO(k)]  // GCproto is put just before [PC-4] aka this FUNCF instr, PC2PROTO(k) = -0x48
     |  mov L:RB, SAVE_L
     |  lea RA, [BASE+RA*8]		// Top of frame.
     |  cmp RA, L:RB->maxstack
     |  ja ->vm_growstack_f
-    |  movzx RAd, byte [PC-4+PC2PROTO(numparams)]
+    |  movzx RAd, byte [PC-4+PC2PROTO(numparams)]  // PC2PROTO(numparams) = -0x5E
     |  cmp NARGS:RDd, RAd		// Check for missing parameters.
     |  jbe >3
     |2:

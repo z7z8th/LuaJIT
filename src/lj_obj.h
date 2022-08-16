@@ -390,9 +390,9 @@ typedef struct GCproto {
   GCRef chunkname;	/* Name of the chunk this function was defined in. */
   BCLine firstline;	/* First line of the function definition. */
   BCLine numline;	/* Number of lines for the function definition. */
-  MRef lineinfo;	/* Compressed map from bytecode ins. to source line. */
-  MRef uvinfo;		/* Upvalue names. */
-  MRef varinfo;		/* Names and compressed extents of local variables. */
+  MRef lineinfo;	/* Compressed map from bytecode ins. to source line. */  // important for debugger
+  MRef uvinfo;		/* Upvalue names. */  // important for debugger
+  MRef varinfo;		/* Names and compressed extents of local variables. */  // important for debugger
 } GCproto;
 
 /* Flags for prototype. */
