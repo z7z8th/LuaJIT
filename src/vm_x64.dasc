@@ -4649,7 +4649,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  jmp <2
     break;
 
-  case BC_FUNCC:
+  case BC_FUNCC:  // C function mainly uses L->top, [fn][ftsz]|[][][ret0][ret1][][retn]
   case BC_FUNCCW:
     |  ins_AD  // BASE = new base, RA = ins RA|RD (unused), RD = nargs+1
     |  mov CFUNC:RB, [BASE-16]
@@ -4681,7 +4681,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  set_vmstate INTERP
     |  lea RA, [BASE+RD*8]
     |  neg RA
-    |  add RA, L:RB->top		// RA = (L->top-(L->base+nresults))*8
+    |  add RA, L:RB->top		// RA = (L->top-(L->base+nresults))*8  // start offset of results, some var may exist under results which is not popped by C function for efficiency
     |  mov PC, [BASE-8]			// Fetch PC of caller.
     |  jmp ->vm_returnc
     break;
