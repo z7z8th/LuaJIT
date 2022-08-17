@@ -2868,7 +2868,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |2:
     |  movd xmm1, RA
     |3:
-    |  add PC, 4
+    |  add PC, 4  // point PC to instr after jump
     |  ucomisd xmm0, xmm1
     |  // Unordered: all of ZF CF PF set, ordered: PF clear.
     |  // To preserve NaN semantics GE/GT branch on unordered, but LT/LE don't.
@@ -2876,8 +2876,8 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  jmp_comp jbe, ja, jb, jae, <9
     |  jmp <6
     |.else
-    |  jmp_comp jbe, ja, jb, jae, >1
-    |  movzx RDd, PC_RD
+    |  jmp_comp jbe, ja, jb, jae, >1  // `if A < D then` trans to `ISGE A D (A>=D)`, if D > A then run instr after jump
+    |  movzx RDd, PC_RD  // RD of jump
     |  branchPC RD
     |1:
     |  ins_next
@@ -3098,21 +3098,21 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  ins_AD	// RA = dst or unused, RD = src, JMP with RD = target
     |  mov ITYPE, [BASE+RD*8]
     |  add PC, 4
-    if (op == BC_ISTC || op == BC_ISFC) {
+    if (op == BC_ISTC || op == BC_ISFC) {  // c = a or b, c = a and b
       |  mov RB, ITYPE
     }
     |  sar ITYPE, 47
     |  cmp ITYPEd, LJ_TISTRUECOND
-    if (op == BC_IST || op == BC_ISTC) {
-      |  jae >1
+    if (op == BC_IST || op == BC_ISTC) {  // IST: if a or b then
+      |  jae >1  // false, not jumping, run next instr after jump
     } else {
-      |  jb >1
+      |  jb >1  // true, also not jumping
     }
     if (op == BC_ISTC || op == BC_ISFC) {
-      |  mov [BASE+RA*8], RB
+      |  mov [BASE+RA*8], RB  // copy RD to RA
     }
     |  movzx RDd, PC_RD
-    |  branchPC RD
+    |  branchPC RD  // jump
     |1:					// Fallthrough to the next instruction.
     |  ins_next
     break;
