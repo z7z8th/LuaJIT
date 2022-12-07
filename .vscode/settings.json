@@ -28,6 +28,20 @@
 		"lj_arch.h": "c",
 		"lj_def.h": "c"
 	},
+        "files.exclude": {
+                "**/.git": true,
+                "**/.svn": true,
+                "**/.hg": true,
+                "**/CVS": true,
+                "**/.DS_Store": true,
+                "**/Thumbs.db": true,
+                "**/.tags": true,
+                "**/*_mips.*": true,
+                "**/*_mips64.*": true,
+                "**/*_ppc.*": true,
+                "**/*_arm.*": true,
+                "**/vm_x86.dasc": true,
+        },
 	"editor.detectIndentation": false,
 	"editor.tabSize": 8
 }
