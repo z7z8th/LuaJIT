@@ -1,4 +1,7 @@
+local json = require 'cjson'
+
 function f4(a, b)
+	json.decode('{"a": 123, "b": "def" }')
 	return a * b
 end
 
