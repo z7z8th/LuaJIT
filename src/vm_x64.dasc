@@ -3635,7 +3635,7 @@ static void build_ins(BuildCtx *ctx, BCOp op, int defop)
     |  jmp ->BC_TSETS_Z
     break;
 
-  case BC_TGETV:  // BC_TGETV -> vmeta_tgetv -> lj_meta_tget -> cont_ra >3 PC=[new base-base + FRAME_CONT] -> mmcall -> vm_call_dispatch_f -> BC_RET -> >7 -> vm_return -> vm_returnp -> cont_dispatch -> jump cont frame aka. cont_ra -> BASE[PC_RA] = BASEE[RC]
+  case BC_TGETV:  // BC_TGETV -> vmeta_tgetv -> lj_meta_tget -> cont_ra >3 PC=[new_base - base + FRAME_CONT] -> mmcall -> vm_call_dispatch_f -> BC_RET -> >7 -> vm_return -> vm_returnp -> cont_dispatch -> jump cont frame aka. cont_ra -> BASE[PC_RA] = BASEE[RC]
     |  ins_ABC	// RA = dst, RB = table, RC = key
     |  mov TAB:RB, [BASE+RB*8]
     |  mov RC, [BASE+RC*8]
