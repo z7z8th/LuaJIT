@@ -155,7 +155,7 @@ static void lex_longstring(LexState *ls, TValue *tv, int sep)
     lex_newline(ls);
   for (;;) {
     switch (ls->c) {
-    case LEX_EOF:
+    case LEX_EOF:  // if no matching ]=*], will finally go here
       lj_lex_error(ls, TK_eof, tv ? LJ_ERR_XLSTR : LJ_ERR_XLCOM);
       break;
     case ']':
@@ -292,6 +292,7 @@ static LexToken lex_scan(LexState *ls, TValue *tv)
 {
   lj_buf_reset(&ls->sb);
   for (;;) {
+    // number/identifier/keyword
     if (lj_char_isident(ls->c)) {
       GCstr *s;
       if (lj_char_isdigit(ls->c)) {  /* Numeric literal. */
@@ -302,7 +303,7 @@ static LexToken lex_scan(LexState *ls, TValue *tv)
       do {
 	lex_savenext(ls);
       } while (lj_char_isident(ls->c));
-      s = lj_parse_keepstr(ls, ls->sb.b, sbuflen(&ls->sb));
+      s = lj_parse_keepstr(ls, ls->sb.b, sbuflen(&ls->sb)); // add string to functionstate const table, ls->fs->kt[s] = true
       setstrV(ls->L, tv, s);
       if (s->reserved > 0)  /* Reserved word? */
 	return TK_OFS + s->reserved;
@@ -383,7 +384,7 @@ static LexToken lex_scan(LexState *ls, TValue *tv)
       }
     case LEX_EOF:
       return TK_eof;
-    default: {
+    default: {  // +-/*^... aka punct.
       LexChar c = ls->c;
       lex_next(ls);
       return c;  /* Single-char tokens (+ - / ...). */
@@ -501,14 +502,14 @@ void lj_lex_error(LexState *ls, LexToken tok, ErrMsg em, ...)
   va_end(argp);
 }
 
-/* Initialize strings for reserved words. */
+/* Initialize strings for reserved words. */ // put keyword string to global hash table
 void lj_lex_init(lua_State *L)
 {
   uint32_t i;
   for (i = 0; i < TK_RESERVED; i++) {
     GCstr *s = lj_str_newz(L, tokennames[i]);
     fixstring(s);  /* Reserved words are never collected. */
-    s->reserved = (uint8_t)(i+1);
+    s->reserved = (uint8_t)(i+1); // keyword offset
   }
 }
 
