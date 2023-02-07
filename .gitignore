@@ -10,3 +10,5 @@
 *.swp
 .tags
 .gdb_history
+/html
+/latex
